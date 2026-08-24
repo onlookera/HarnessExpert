@@ -177,7 +177,7 @@ function distToTri(px, py, ax, ay, bx, by, cx, cy) {
 const outDir = path.join(__dirname, "..", "assets");
 fs.mkdirSync(outDir, { recursive: true });
 
-for (const size of [256, 32, 16]) {
+for (const size of [512, 256, 32, 16]) {
   const png = encodePng(size, iconPixel(size));
   const file = path.join(outDir, `icon-${size}.png`);
   fs.writeFileSync(file, png);

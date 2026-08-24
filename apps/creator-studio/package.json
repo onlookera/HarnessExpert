@@ -74,7 +74,7 @@
       "artifactName": "达人营销工作台-${version}-portable.exe"
     },
     "mac": {
-      "icon": "assets/icon.ico",
+      "icon": "assets/icon-512.png",
       "category": "public.app-category.business",
       "extraResources": [
         { "from": "assets/node-v20.18.0-darwin-arm64.tar.gz", "to": "node-v20.18.0-darwin-arm64.tar.gz" },
