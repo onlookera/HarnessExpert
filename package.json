@@ -14,6 +14,8 @@
     "native/landlock-run",
     "native/landlock-run/packages/*",
     "apps/*",
+    "!apps/creator-studio",
+    "!apps/desktop",
     "website"
   ],
   "scripts": {
