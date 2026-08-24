@@ -8,16 +8,6 @@
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
   },
-  "workspaces": [
-    "vendor/*",
-    "packages/*/*",
-    "native/landlock-run",
-    "native/landlock-run/packages/*",
-    "apps/*",
-    "!apps/creator-studio",
-    "!apps/desktop",
-    "website"
-  ],
   "scripts": {
     "build": "tsx scripts/build.ts",
     "build:official": "tsx scripts/build.ts --profile official",
