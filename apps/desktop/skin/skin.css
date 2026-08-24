@@ -1,0 +1,252 @@
+/* ============================================================
+   DSH Desktop — 「深海脉冲」皮肤 (injected into the harness page)
+   通过覆盖 dsh 主题的 --dsw-static-* token 整体换肤。
+   中文优先，科技感，暗色深海 + 电光蓝 + 极光流动。
+   ============================================================ */
+
+/* ---- 深海色板：覆盖暗色主题的全部静态 token（alias 层自动跟随） ----
+   注意：harness 实际把这些 token 声明在 body 上（普通样式表规则），
+   会盖过从 :root 继承的值。因此必须同时声明在 :root 与 body 上，配合
+   !important + insertCSS(cssOrigin:'user') 的 user-!important 优先级
+   （user-!important > author 任何声明，含 body 级 author-normal），
+   才能稳定胜出。旧版用 body[data-ds-dark-theme] 是因为误以为 harness
+   会设该属性，实际并不设。 */
+:root, body {
+  /* 背景层（调浅 + 更透：中性浅灰蓝，壁纸明显透出） */
+  --dsw-static-neutral-bluish-1000: #eaf1ff !important;   /* 反白文字（在强调色上） */
+  --dsw-static-neutral-bluish-950: rgba(28, 36, 56, 0.50) !important;   /* 最底层背景 */
+  --dsw-static-neutral-bluish-900: rgba(30, 38, 60, 0.48) !important;   /* 深一层 */
+  --dsw-static-neutral-bluish-875: rgba(32, 40, 64, 0.46) !important;   /* 主背景 layer-1 */
+  --dsw-static-neutral-bluish-850: rgba(34, 42, 68, 0.44) !important;   /* 深层 */
+  --dsw-static-neutral-bluish-800: rgba(36, 45, 72, 0.42) !important;   /* 面板 layer-2 */
+  --dsw-static-neutral-bluish-750: rgba(40, 50, 80, 0.42) !important;   /* hover 底色 */
+  --dsw-static-neutral-bluish-700: rgba(42, 52, 84, 0.42) !important;   /* 凸起表面 */
+  --dsw-static-neutral-bluish-600: rgba(50, 62, 96, 0.48) !important;   /* 边框/分隔 */
+  --dsw-static-neutral-bluish-400: rgba(62, 76, 114, 0.54) !important;   /* 弱边框 */
+  --dsw-static-neutral-bluish-300: rgba(74, 90, 132, 0.54) !important;   /* 更亮边框 */
+  --dsw-static-neutral-bluish-100: #dbe6f7 !important;   /* 主文字 */
+  --dsw-static-neutral-bluish-50:  #e8eefb !important;   /* 高亮文字 */
+  /* 中性灰文字（提得非常亮，接近白，保证小灰字在壁纸上可读） */
+  --dsw-static-neutral-850: #4a5a80 !important;
+  --dsw-static-neutral-700: #ecf1fb !important;
+  --dsw-static-neutral-600: #e7edf9 !important;
+  --dsw-static-neutral-550: #eef3fc !important;
+  /* 灰字层级（次要/三级/注释/弱化文字）：
+     暗色主题下这些 alias 原本指向被调成半透明的 bluish-300/400/600/750，
+     导致灰字发虚看不清。这里直接脱钩、提亮为实色浅灰蓝，保证壁纸上可读。 */
+  --dsw-alias-label-secondary: #d9e2f4 !important;
+  --dsw-alias-label-tertiary: #c3cfe6 !important;
+  --dsw-alias-label-caption: #b9c6de !important;
+  --dsw-alias-label-dimmed: #9daecc !important;
+  /* ---- alias 层整体切暗 ----
+     根因：harness 当前跑在浅色主题 token 上（桌面端未设 data-ds-dark-theme），
+     设置弹窗 bg-layer-2=纯白、mask=黑0.24+blur，于是白磨砂面板+黑字，
+     提亮的灰字在白底上反而没对比。这里把 alias 层覆盖为深色半透明值：
+     面板/遮罩/按钮/滚动条全部落深色，灰字在深色面板上清晰。 */
+  --dsw-alias-bg-base: rgba(21, 27, 45, 0.72) !important;
+  --dsw-alias-bg-layer-1: rgba(26, 33, 54, 0.78) !important;
+  --dsw-alias-bg-layer-2: rgba(31, 40, 66, 0.82) !important;
+  --dsw-alias-bg-layer-3: rgba(37, 47, 76, 0.85) !important;
+  --dsw-alias-bg-overlay: rgba(42, 52, 84, 0.90) !important;
+  --dsw-alias-bg-mask-1: rgba(4, 8, 18, 0.58) !important;
+  --dsw-alias-bg-mask-2: rgba(4, 8, 18, 0.38) !important;
+  --dsw-alias-bg-mask-3: rgba(4, 8, 18, 0.62) !important;
+  --dsw-alias-bg-mask-drop: rgba(10, 16, 32, 0.82) !important;
+  --dsw-alias-bg-module-platform: rgba(28, 36, 60, 0.80) !important;
+  --dsw-alias-bg-multi-select: rgba(52, 62, 96, 0.85) !important;
+  --dsw-alias-bg-skeleton: rgba(255, 255, 255, 0.08) !important;
+  --dsw-alias-border-l1: rgba(255, 255, 255, 0.07) !important;
+  --dsw-alias-border-l2: rgba(255, 255, 255, 0.12) !important;
+  --dsw-alias-border-l2-darkmode-thin: rgba(255, 255, 255, 0.07) !important;
+  --dsw-alias-border-l3: rgba(255, 255, 255, 0.16) !important;
+  --dsw-alias-border-l4: rgba(255, 255, 255, 0.20) !important;
+  --dsw-alias-border-inverted: rgba(255, 255, 255, 0.06) !important;
+  --dsw-alias-border-inverted2: rgba(255, 255, 255, 0.08) !important;
+  --dsw-alias-label-primary: #eef3fc !important;
+  --dsw-alias-label-primary-dimmed: #d7e0f2 !important;
+  --dsw-alias-label-primary-foreground: #0b101f !important;
+  --dsw-alias-label-primary-inverted: #0b101f !important;
+  --dsw-alias-brand-primary: #eaf1ff !important;
+  --dsw-alias-brand-text: #eaf1ff !important;
+  --dsw-alias-brand-primary-invert: #101828 !important;
+  --dsw-alias-button-contrast-fill: #eaf1ff !important;
+  --dsw-alias-button-elevated-fill: rgba(52, 62, 96, 0.90) !important;
+  --dsw-alias-button-floating-fill: rgba(34, 42, 68, 0.90) !important;
+  --dsw-alias-button-floating-hover: rgba(42, 52, 84, 0.95) !important;
+  --dsw-alias-button-ghost-active-fill: rgba(52, 62, 96, 0.85) !important;
+  --dsw-alias-button-ghost-active-hover: rgba(60, 72, 110, 0.90) !important;
+  --dsw-alias-button-ghost-active-border: rgba(127, 176, 255, 0.50) !important;
+  --dsw-alias-button-primary-dimmed: rgba(52, 62, 96, 0.80) !important;
+  --dsw-alias-button-primary-hover: #d3dff2 !important;
+  --dsw-alias-button-tool-bar-fill: rgba(50, 62, 96, 0.60) !important;
+  --dsw-alias-button-tool-bar-hover: rgba(62, 76, 114, 0.70) !important;
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(21, 27, 45, 0.45) !important;
+  --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.08) !important;
+  --dsw-alias-interactive-bg-active: rgba(255, 255, 255, 0.14) !important;
+  --dsw-alias-interactive-bg-hover-accent: rgba(79, 140, 255, 0.18) !important;
+  --dsw-alias-interactive-bg-hover-danger: rgba(242, 90, 90, 0.15) !important;
+  --dsw-alias-interactive-bg-hover-solid: rgba(36, 45, 72, 0.90) !important;
+  --dsw-alias-markdown-code-block: rgba(15, 20, 36, 0.85) !important;
+  --dsw-alias-markdown-code-block-banner: rgba(26, 33, 54, 0.90) !important;
+  --dsw-alias-markdown-inline-code: rgba(36, 45, 72, 0.80) !important;
+  --dsw-alias-markdown-citation: rgba(36, 45, 72, 0.80) !important;
+  --dsw-alias-markdown-tag: rgba(36, 45, 72, 0.80) !important;
+  --dsw-alias-markdown-placeholder: rgba(42, 52, 84, 0.60) !important;
+  --dsw-alias-markdown-code-segment-selected: rgba(52, 62, 96, 0.85) !important;
+  --dsw-alias-markdown-code-segment-unselected: rgba(21, 27, 45, 0.85) !important;
+  --dsw-alias-scrollbar-bg-l1: rgba(90, 105, 150, 0.55) !important;
+  --dsw-alias-scrollbar-bg-l2: rgba(90, 105, 150, 0.45) !important;
+  --dsw-alias-scrollbar-hover-l1: rgba(127, 176, 255, 0.70) !important;
+  --dsw-alias-scrollbar-hover-l2: rgba(127, 176, 255, 0.55) !important;
+  --dsw-alias-toast-bg: rgba(40, 50, 80, 0.92) !important;
+  --dsw-alias-tooltip-bg: rgba(40, 50, 80, 0.92) !important;
+  --dsw-specific-bubble: rgba(34, 42, 68, 0.85) !important;
+  --dsw-specific-bubble-highlight: rgba(40, 50, 80, 0.90) !important;
+  --dsw-specific-input-major: rgba(26, 33, 54, 0.85) !important;
+  --dsw-specific-login-input: rgba(21, 27, 45, 0.90) !important;
+  --dsw-specific-selector: rgba(36, 45, 72, 0.85) !important;
+  --dsw-specific-sidebar-fill: rgba(24, 30, 50, 0.75) !important;
+  --dsw-specific-sidebar-nav-item-active: rgba(40, 50, 80, 0.85) !important;
+  --dsw-specific-sidebar-nav-item-hover: rgba(34, 42, 68, 0.80) !important;
+  --dsw-specific-tip: rgba(36, 45, 72, 0.90) !important;
+  /* 品牌电光蓝（DeepSeek 主色 → 更亮更电） */
+  --dsw-static-deepseek-800: #3f5f9e !important;
+  --dsw-static-deepseek-500: #4f8cff !important;
+  --dsw-static-deepseek-450: #5b93ff !important;
+  --dsw-static-deepseek-400: #7fb0ff !important;
+  /* 状态色（青玉/琥珀/朱红，微霓虹） */
+  --dsw-static-green-500: #34d399 !important;
+  --dsw-static-green-400: #4ade80 !important;
+  --dsw-static-green-900: #0c1f14 !important;
+  --dsw-static-amber-500: #fbbf24 !important;
+  --dsw-static-amber-400: #fcd34d !important;
+  --dsw-static-amber-600: #f59e0b !important;
+  --dsw-static-amber-900: #1c150a !important;
+  --dsw-static-red-400: #f87171 !important;
+}
+
+/* ---- 基础底色（透明，让壁纸透出；窗口/正文压暗靠 preload 的 overlay） ---- */
+html, body {
+  background-color: transparent !important;
+}
+
+/* ---- 文字阴影 + 深色描边：让文字在花壁纸上也清晰突出 ---- */
+body, body * {
+  text-shadow:
+    0 1px 2px rgba(2, 4, 10, 0.92),
+    0 0 8px rgba(2, 4, 10, 0.6),
+    -1px -1px 1px rgba(2, 4, 10, 0.85),
+    1px 1px 1px rgba(2, 4, 10, 0.85);
+}
+
+/* ---- 内容层置于壁纸之上；整页下移 44px 让出深色标题栏与系统控件 ---- */
+#root {
+  position: relative;
+  z-index: 2;
+}
+#root [class*="_frame"] {
+  margin-top: 44px !important;
+  min-height: calc(100vh - 44px) !important;
+  height: calc(100vh - 44px) !important;
+  background: transparent !important;   /* 主框架透明，壁纸透出 */
+}
+/* 让壁纸贯穿整个内容区：内容面板背景全部透明（同底部透明条标准） */
+#root [class*="_frame"] * {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* ---- 代码字体：优先 Cascadia Code（本机已装） ---- */
+body {
+  --ds-font-family-code: "Cascadia Code", "JetBrains Mono", "SF Mono",
+    Consolas, "Fira Code", "PingFang SC", "Microsoft YaHei", monospace;
+}
+
+/* ---- 选区：电光蓝 ---- */
+body *::selection {
+  background: rgba(79, 140, 255, 0.38);
+  color: #eaf1ff;
+}
+
+/* ---- 滚动条：细、蓝、悬停发光 ---- */
+body::-webkit-scrollbar,
+body *::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+body::-webkit-scrollbar-thumb,
+body *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #2c406e, #1c2f58);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+body::-webkit-scrollbar-thumb:hover,
+body *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #4f8cff, #2c406e);
+  background-clip: padding-box;
+}
+body::-webkit-scrollbar-track,
+body *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- 焦点：柔和光晕 ---- */
+body *:focus-visible {
+  outline: 2px solid rgba(79, 140, 255, 0.6);
+  outline-offset: 1px;
+}
+
+/* ---- 「极光」氛围层：调得非常淡，只留一丝氛围（不再压住壁纸/盖一层蓝） ---- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 34% at 18% 22%, rgba(79, 140, 255, 0.05), transparent 68%),
+    radial-gradient(36% 30% at 82% 16%, rgba(139, 92, 246, 0.04), transparent 66%),
+    radial-gradient(46% 40% at 64% 84%, rgba(34, 211, 238, 0.03), transparent 70%),
+    radial-gradient(30% 26% at 30% 78%, rgba(59, 130, 246, 0.04), transparent 66%);
+  filter: blur(6px);
+  animation: dsh-aurora-drift 46s ease-in-out infinite alternate;
+  opacity: 0.5;
+}
+@keyframes dsh-aurora-drift {
+  0%   { transform: translate3d(-2%, -1%, 0) scale(1); }
+  50%  { transform: translate3d(2%, 2%, 0) scale(1.06); }
+  100% { transform: translate3d(-1%, 1.5%, 0) scale(1.02); }
+}
+
+/* ---- 输入框聚焦光晕（harness 内部控件） ---- */
+body input:focus,
+body textarea:focus,
+body [contenteditable="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.22) !important;
+}
+
+/* ---- 品牌强调色微光：顶部一条电光蓝渐变线，增强窗口质感 ---- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 2147483647;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(79,140,255,0.85), rgba(34,211,238,0.7), rgba(139,92,246,0.75), transparent);
+  opacity: 0.75;
+}
+
+/* ---- 尊重减少动效偏好 ---- */
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

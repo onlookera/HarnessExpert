@@ -1,0 +1,3 @@
+name: 标准+多引擎
+description: 完整编程 Agent（同标准模式），额外启用 Codex 与 Claude Code 子代理，可把子任务外包给本机已装的 Codex / Claude Code；网页抓取 fetch 已开启。
+order: 1

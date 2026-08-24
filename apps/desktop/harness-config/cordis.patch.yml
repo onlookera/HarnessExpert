@@ -1,0 +1,50 @@
+# DSH Desktop 扩展补丁层（用户自定义）
+# 应用顺序：bundle 层 → 本文件 → $DSH_HOME/cordis.patch.yml → --patch
+#
+# 1) 默认 agent 预设改为 standard-codex（启用 Codex / Claude Code 子代理）
+#    想换回内置标准模式，把 default 改回 standard 即可。
+- id: agent-presets
+  config:
+    default: standard-codex
+
+# 2) MCP 服务器接入（一个 mcp-client 实例 = 一个外部服务器）
+#    服务器工具以 mcp__<serverName>__<工具名> 出现在 agent 工具列表。
+#    failOnStartupError: false —— 连不上只警告不阻塞启动。
+- insert:
+    # 浏览器自动化：Playwright（填表/爬取/点击页面）
+    - id: mcp-browser
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: browser
+        command: npx
+        args: ["-y", "@playwright/mcp@latest"]
+        failOnStartupError: false
+        reconnect:
+          enabled: true
+
+    # Office 文档自动化：Word/Excel/PPT/Outlook/Access/OneNote/WPS（COM 驱动）
+    # 需要本机已装 Microsoft Office 或 WPS，且已装 uv（python 包管理器）
+    - id: mcp-office
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: office
+        command: uvx
+        args: ["officemcp"]
+        failOnStartupError: false
+        reconnect:
+          enabled: true
+
+    # 数据库：SQLite（零配置起步，库文件自动创建）
+    # 想接 Postgres/MySQL，再加一个 mcp-client 实例并换 command/args 即可
+    - id: mcp-db
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: db
+        command: npx
+        args: ["-y", "mcp-server-sqlite", "--db", 'C:\Users\25280\.dsh\data\sqlite.db']
+        failOnStartupError: false
+        reconnect:
+          enabled: true

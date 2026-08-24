@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;" />
+  <title>记忆库 · DSH Desktop</title>
+  <link rel="stylesheet" href="memories.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">◈</span>
+      <div class="brand-text">
+        <h1>记忆库 <em>Memory Vault</em></h1>
+        <p>Codex 与 Claude Code 会话记忆 · 全部保存在本机</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="btn-close" class="btn" title="收起面板 (Esc)">✕ 收起</button>
+      <button id="btn-scan" class="btn" title="重新扫描 Codex 与 Claude Code 的会话目录">⟳ 重新扫描</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="memories">🗂 会话记忆 <em>Codex / Claude 历史</em></button>
+    <button class="tab" data-tab="dictionary">🧭 能力词典 <em>Skill · MCP 中文说明</em></button>
+  </nav>
+
+  <main class="layout">
+    <!-- ============ 会话记忆 ============ -->
+    <section id="pane-memories" class="pane">
+      <aside class="sidebar">
+        <div class="search-row">
+          <input id="search" type="search" placeholder="全文检索所有会话记忆…" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="filters" id="filters">
+          <button class="chip active" data-source="all">全部</button>
+          <button class="chip" data-source="codex">Codex 代码代理</button>
+          <button class="chip" data-source="claude">Claude 对话</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <ul class="session-list" id="session-list"></ul>
+        <div class="empty" id="list-empty" hidden>
+          <p id="empty-text">正在索引会话…</p>
+        </div>
+      </aside>
+
+      <section class="detail" id="detail">
+        <div class="detail-empty" id="detail-empty">
+          <div class="detail-empty-icon">🗂</div>
+          <p>从左侧选择一个会话查看完整对话</p>
+          <p class="dim">支持按会话、按关键词全文检索历史记忆</p>
+        </div>
+        <div class="detail-body" id="detail-body" hidden></div>
+      </section>
+    </section>
+
+    <!-- ============ 能力词典 ============ -->
+    <section id="pane-dictionary" class="pane" hidden>
+      <div class="dict-search-row">
+        <input id="dict-search" type="search" placeholder="搜索能力：技能 / MCP / 插件…" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="dict-body" id="dict-body"></div>
+    </section>
+  </main>
+
+  <footer class="statusbar" id="statusbar">…</footer>
+
+  <script src="memories.js"></script>
+</body>
+</html>

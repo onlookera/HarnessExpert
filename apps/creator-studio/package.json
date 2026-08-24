@@ -1,0 +1,93 @@
+{
+  "name": "dsh-creator-studio",
+  "productName": "达人营销工作台",
+  "version": "1.0.0",
+  "description": "达人营销工作流桌面端：达人筛选 → 邀约 → 洽谈 → 确认 → 内容对接 → 脚本审核 → 发布上线 → 数据复盘，内置工作流看板、达人库、话术/审核/复盘模板与平台自动化助手；同时内置 DeepSeek Harness 引擎与记忆库（读取本机使用者自己的 Codex / Claude Code 会话）。",
+  "author": "Creator Studio",
+  "main": "main.js",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node scripts/launch.cjs",
+    "smoke": "node scripts/launch.cjs --smoke",
+    "dist": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "gen-icon": "node scripts/gen-icon.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "32.3.3",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.creatorstudio.dsh",
+    "productName": "达人营销工作台",
+    "asar": true,
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-main.js",
+      "lib/**/*",
+      "renderer/**/*",
+      "skin/**/*",
+      "assets/**/*",
+      "!assets/node-*.zip",
+      "!assets/node-*.tar.gz",
+      "workflow-skills/**/*",
+      "package.json"
+    ],
+    "extraResources": [],
+    "win": {
+      "icon": "assets/icon.ico",
+      "extraResources": [
+        { "from": "assets/node-portable.zip", "to": "node-portable.zip" }
+      ],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "达人营销工作台",
+      "artifactName": "达人营销工作台-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "达人营销工作台-${version}-portable.exe"
+    },
+    "mac": {
+      "icon": "assets/icon.ico",
+      "category": "public.app-category.business",
+      "extraResources": [
+        { "from": "assets/node-v20.18.0-darwin-arm64.tar.gz", "to": "node-v20.18.0-darwin-arm64.tar.gz" },
+        { "from": "assets/node-v20.18.0-darwin-x64.tar.gz", "to": "node-v20.18.0-darwin-x64.tar.gz" }
+      ],
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] },
+        { "target": "zip", "arch": ["arm64", "x64"] }
+      ],
+      "artifactName": "达人营销工作台-${version}-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "达人营销工作台 ${version}"
+    }
+  }
+}

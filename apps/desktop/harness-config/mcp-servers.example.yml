@@ -1,0 +1,116 @@
+# MCP 服务器配置模板（DeepSeek Harness）
+
+把下面**需要的部分**复制进 `C:\Users\25280\.dsh\profiles\web\cordis.patch.yml`
+（追加到列表末尾），然后重启 `dsh web` / 桌面端生效。
+
+一个 `mcp-client` 实例 = 一个外部 MCP 服务器。
+连上后，服务器工具会以 `mcp__<serverName>__<工具名>` 出现在 agent 的工具列表里。
+
+---
+
+## 0) 最小格式速查
+
+```yaml
+# stdio：本地命令启动（最常用）
+- insert:
+    - id: mcp-<随便起个唯一id>
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: <1-32位字母数字下划线，如 browser>
+        command: npx
+        args: ["-y", "<包名>", "--参数"]
+        # env: {}            # 可选：给服务器的环境变量
+        # cwd: ""            # 可选：工作目录
+        # failOnStartupError: true   # 连不上就直接报错（默认 false 只警告）
+        # reconnect:
+        #   enabled: true
+
+# streamable-http：连远程 HTTP 服务
+- insert:
+    - id: mcp-<唯一id>
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: streamable-http
+        serverName: <名字>
+        url: https://example.com/mcp
+        # headers: { Authorization: "Bearer xxx" }
+```
+
+---
+
+## 1) 浏览器自动化（Playwright）— 推荐第一个装
+
+```yaml
+- insert:
+    - id: mcp-playwright
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: browser
+        command: npx
+        args: ["-y", "@playwright/mcp@latest"]
+        failOnStartupError: false
+        reconnect:
+          enabled: true
+```
+
+> 装好后可以说："用浏览器打开 https://xxx 登录并把订单表格存成 csv"。
+
+## 2) Office 文档自动化（Word/Excel/PPT/Outlook/WPS）
+
+```yaml
+- insert:
+    - id: mcp-office
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: office
+        command: npx
+        args: ["-y", "office-mcp"]   # 或按 OfficeMCP 项目 README 指定的启动方式
+        failOnStartupError: false
+```
+
+> 需要本机装有 Microsoft Office 或 WPS。项目地址：
+> https://github.com/OfficeMCP/OfficeMCP
+
+## 3) 数据库（以 SQLite 为例）
+
+```yaml
+- insert:
+    - id: mcp-sqlite
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: db
+        command: npx
+        args: ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "D:/data/mydb.sqlite"]
+        failOnStartupError: false
+```
+
+## 4) 网页抓取增强（可选，替代/补充内置 web 工具）
+
+内置 `tool-web` 当前 `fetch: false`（只搜索不读正文）。想开抓取，改 patch：
+
+```yaml
+- id: tool-web
+  config:
+    fetch: true
+```
+
+## 5) 其他常见服务器（按需搜 npm/github）
+
+- GitHub：`npx -y github-mcp-server`（需 GITHUB_TOKEN）
+- 邮件：Gmail MCP（googleapis）、Outlook MCP（社区）
+- 飞书/钉钉/企业微信：社区 MCP，接入前先审代码和权限
+- 网盘：阿里云盘/百度网盘社区 MCP
+
+---
+
+## 验证是否连上
+
+1. 重启 web / 桌面端
+2. 新开会话，直接问："你现在有哪些工具？有没有 mcp__browser 开头的？"
+3. 或者在 UI 的设置 → 插件清单里看 `mcp-client` 实例是否加载成功
+
+> 常见坑：`npx` 首次会下载包（慢/需网络）；`failOnStartupError` 设 true 时连不上会直接启动失败，排查问题时可临时开。

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;" />
+  <title>达人营销工作台</title>
+  <link rel="stylesheet" href="workflow.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">◈</span>
+      <div class="brand-text">
+        <h1>达人营销工作台 <em>Creator Studio</em></h1>
+        <p>筛选 → 邀约 → 洽谈 → 确认 → 对接 → 审核 → 发布 → 复盘</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="btn-add" class="btn primary">＋ 新增达人</button>
+      <button id="btn-export" class="btn" title="导出达人库为 CSV">⇩ 导出 CSV</button>
+      <button id="btn-skills" class="btn" title="安装工作流技能到本机">🛠 安装技能</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="board">🗂 流程看板 <em>8 阶段流水线</em></button>
+    <button class="tab" data-tab="templates">📋 模板库 <em>话术 · 审核 · 复盘</em></button>
+    <button class="tab" data-tab="settings">⚙ 设置 <em>API · MCP · 说明</em></button>
+  </nav>
+
+  <main class="layout">
+    <!-- ============ 流程看板 ============ -->
+    <section id="pane-board" class="pane">
+      <div class="board-tools">
+        <input id="search" type="search" placeholder="搜索达人 / 平台 / 垂类 / 备注…" autocomplete="off" spellcheck="false" />
+        <select id="filter-platform">
+          <option value="">全部平台</option>
+          <option value="小红书">小红书</option>
+          <option value="抖音">抖音</option>
+          <option value="快手">快手</option>
+          <option value="B站">B站</option>
+          <option value="微博">微博</option>
+          <option value="视频号">视频号</option>
+        </select>
+        <span id="board-count" class="count"></span>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="empty" id="board-empty" hidden>
+        <p>还没有达人数据，点右上角「＋ 新增达人」开始你的第一个流程</p>
+      </div>
+    </section>
+
+    <!-- ============ 模板库 ============ -->
+    <section id="pane-templates" class="pane" hidden>
+      <div class="tpl-wrap">
+        <div class="tpl-section">
+          <h3>💬 邀约 / 洽谈话术模板 <em>点击复制，{品牌} {报价} 等占位符按需替换</em></h3>
+          <div id="tpl-talking" class="tpl-grid"></div>
+        </div>
+        <div class="tpl-section">
+          <h3>✅ 脚本 / 内容审核清单</h3>
+          <div id="tpl-review" class="tpl-list"></div>
+        </div>
+        <div class="tpl-section">
+          <h3>📊 复盘指标</h3>
+          <div id="tpl-metrics" class="tpl-chips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 设置 ============ -->
+    <section id="pane-settings" class="pane" hidden>
+      <div class="set-wrap">
+        <div class="set-card">
+          <h3>🔑 1. 配置你的 API Key（每个人填自己的）</h3>
+          <ol>
+            <li>打开主窗口（或菜单「视图 → DSH Web 地址」）进入 harness 界面</li>
+            <li>点左下角/顶部的「设置」→「模型」→ 填入你的 API Key（DeepSeek / OpenAI 等，与 dsh 兼容）</li>
+            <li>也可以设置环境变量 <code>DEEPSEEK_API_KEY</code> 后重启应用</li>
+          </ol>
+          <p class="dim">本应用不内置任何密钥；你的 Key 只存在你自己机器上（~/.dsh/.credentials.yaml）。</p>
+        </div>
+
+        <div class="set-card">
+          <h3>🖥 2. 平台自动化（MCP，按需开启）</h3>
+          <p>把下面的配置追加到 <code>%USERPROFILE%\.dsh\profiles\web\cordis.patch.yml</code>，重启应用即生效。
+            之后在 harness 里让 AI 用 <code>mcp__browser__*</code> 自动打开平台/数据站点筛选达人、抓数据。</p>
+          <pre id="mcp-config"></pre>
+          <button id="btn-copy-mcp" class="btn">复制 MCP 配置</button>
+        </div>
+
+        <div class="set-card">
+          <h3>🛠 3. 工作流技能</h3>
+          <p>安装后，harness 里说"帮我筛选达人 / 写邀约话术 / 审脚本 / 复盘数据"就会自动调用对应技能。</p>
+          <button id="btn-skills2" class="btn primary">安装工作流技能到本机</button>
+          <span id="skills-status" class="dim"></span>
+        </div>
+
+        <div class="set-card">
+          <h3>🔒 隐私与数据</h3>
+          <ul>
+            <li>业务数据（达人库/流程）只存本机：<code>%APPDATA%\dsh-creator-studio\workflow.json</code></li>
+            <li>记忆库读取的是【本机使用者自己】的 Codex / Claude Code 会话，不包含作者任何数据</li>
+            <li>无联网上报；只有你主动配置的 API Key 会用于模型调用</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="statusbar" id="statusbar">达人营销工作台 v1.0 · 数据仅存本机</footer>
+
+  <!-- 开箱即用引导（首次运行：自动装引擎 + 填 API Key） -->
+  <div class="modal-mask" id="setup-wizard" hidden>
+    <div class="modal setup">
+      <h2>🚀 开始使用达人营销工作台</h2>
+      <div class="setup-steps">
+        <div class="step" id="step-engine">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">准备 AI 引擎（自动完成，无需装任何东西）</div>
+            <div class="step-status" id="setup-status">正在检测运行环境…</div>
+            <div class="bar"><i id="setup-bar" style="width:8%"></i></div>
+          </div>
+        </div>
+        <div class="step" id="step-key">
+          <div class="step-num">2</div>
+          <div class="grow">
+            <div class="step-title">填写你的 API Key（DeepSeek / OpenAI 兼容）</div>
+            <input id="setup-api-key" type="password" placeholder="sk-…（只保存在你本机 ~/.dsh/.credentials.yaml）" />
+            <div class="hint dim">还没有？到 platform.deepseek.com 等平台申请。密钥只写到你本机，不上传。</div>
+          </div>
+        </div>
+        <div class="step" id="step-done">
+          <div class="step-num">3</div>
+          <div class="grow">
+            <div class="step-title">进入工作台</div>
+            <div class="step-status" id="setup-done-status">保存后即可打开主窗口开始使用</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="btn-setup-next">下一步</button>
+        <button class="btn" id="btn-setup-open" hidden>打开主窗口（AI 助手）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增/编辑达人弹窗 -->
+  <div class="modal-mask" id="modal" hidden>
+    <div class="modal">
+      <h2 id="modal-title">新增达人</h2>
+      <div class="form">
+        <label>达人名称 *<input id="f-name" placeholder="如：阿鱼酱" /></label>
+        <div class="form-row">
+          <label>平台
+            <select id="f-platform">
+              <option>小红书</option><option>抖音</option><option>快手</option>
+              <option>B站</option><option>微博</option><option>视频号</option>
+            </select>
+          </label>
+          <label>粉丝量 <input id="f-followers" type="number" placeholder="0" /></label>
+        </div>
+        <label>账号 / ID <input id="f-account" placeholder="主页链接或账号" /></label>
+        <label>垂类 <input id="f-niche" placeholder="如：美妆 / 数码 / 穿搭" /></label>
+        <div class="form-row">
+          <label>联系方式
+            <select id="f-contact">
+              <option>微信</option><option>私信</option><option>邮箱</option><option>手机号</option><option>其他</option>
+            </select>
+          </label>
+          <label>联系值 <input id="f-contact-value" placeholder="微信号 / 邮箱等" /></label>
+        </div>
+        <label>报价 <input id="f-price" placeholder="如：5000 / 5000+佣金20%" /></label>
+        <label>当前阶段
+          <select id="f-stage"></select>
+        </label>
+        <label>备注 <textarea id="f-notes" rows="3" placeholder="沟通记录 / 关键结论…"></textarea></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="btn-modal-cancel">取消</button>
+        <button class="btn primary" id="btn-modal-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="workflow.js"></script>
+</body>
+</html>

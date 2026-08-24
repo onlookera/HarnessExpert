@@ -1,0 +1,54 @@
+# 达人营销工作台 —— 自动打包 Windows + macOS
+# 用法：推到 GitHub 后，在仓库 Actions 页选择本工作流 → Run workflow；
+# 或推送 tag（creator-studio-v*）自动触发。产物在本次运行的 Artifacts 里下载。
+name: 达人营销工作台 打包
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - expertworek
+      - main
+    tags:
+      - "creator-studio-v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/creator-studio/package-lock.json
+
+      - name: 安装依赖（creator-studio）
+        working-directory: apps/creator-studio
+        run: npm install --no-audit --no-fund
+
+      - name: 打包 Windows（exe 安装版 + 便携版）
+        if: runner.os == 'Windows'
+        working-directory: apps/creator-studio
+        run: npm run dist
+
+      - name: 打包 macOS（dmg + zip，Apple Silicon 与 Intel）
+        if: runner.os == 'macOS'
+        working-directory: apps/creator-studio
+        run: npm run dist:mac
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: creator-studio-${{ runner.os }}
+          path: |
+            apps/creator-studio/dist/*.exe
+            apps/creator-studio/dist/*.dmg
+            apps/creator-studio/dist/*.zip
+            apps/creator-studio/docs/*.md
+          if-no-files-found: warn

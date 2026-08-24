@@ -1,0 +1,69 @@
+{
+  "name": "dsh-desktop",
+  "productName": "DSH Desktop",
+  "version": "0.2.0",
+  "description": "DeepSeek Harness 桌面端：单窗口加载 dsh web UI，右侧滑出记忆库面板，导入并全文检索 Codex 与 Claude Code 的会话历史。",
+  "author": "DSH Desktop",
+  "main": "main.js",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node scripts/launch.cjs",
+    "smoke": "node scripts/launch.cjs --smoke",
+    "dist": "electron-builder --win",
+    "gen-icon": "node scripts/gen-icon.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "32.3.3",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.deepseek.dshdesktop",
+    "productName": "DSH Desktop",
+    "asar": true,
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-main.js",
+      "lib/**/*",
+      "renderer/**/*",
+      "skin/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DSH Desktop",
+      "artifactName": "DSH-Desktop-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "DSH-Desktop-${version}-portable.exe"
+    }
+  }
+}
