@@ -82,6 +82,50 @@ function summarizeStore() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// 开箱即用（引擎自举 + API Key）——模块顶层，供 registerMemoryIpc 与 whenReady 共用
+// ---------------------------------------------------------------------------
+let setupState = { nodeReady: false, engineReady: false, apiKeySet: false };
+let provisioning = null;
+
+function setupResources() {
+  return {
+    resourcesDir: process.resourcesPath, // 打包后指向 app 资源目录
+    userDataDir: path.join(app.getPath("userData"), "runtime"),
+  };
+}
+
+function pushSetupStatus(msg) {
+  for (const w of [workflowWindow]) {
+    if (w && !w.isDestroyed()) w.webContents.send("setup:status", msg);
+  }
+}
+
+async function runProvision() {
+  if (provisioning) return provisioning;
+  provisioning = (async () => {
+    try {
+      pushSetupStatus("正在准备运行环境…");
+      const { resourcesDir, userDataDir } = setupResources();
+      const node = setup.ensureNode({ resourcesDir, userDataDir, onStatus: pushSetupStatus });
+      process.env.DSH_DESKTOP_NODE_BIN = node; // dsh-boot 优先用它
+      setupState.nodeReady = true;
+      const engine = await setup.ensureEngine({ node, onStatus: pushSetupStatus });
+      setupState.engineReady = !!engine;
+      setupState.apiKeySet = setup.hasApiKey();
+      pushSetupStatus(setupState.apiKeySet ? "引擎与密钥就绪" : "引擎就绪，请填写 API Key");
+      for (const w of [workflowWindow]) if (w && !w.isDestroyed()) w.webContents.send("setup:ready", setupState);
+    } catch (e) {
+      setupState.nodeReady = false;
+      pushSetupStatus("安装失败：" + e.message);
+      for (const w of [workflowWindow]) if (w && !w.isDestroyed()) w.webContents.send("setup:error", e.message);
+    } finally {
+      provisioning = null;
+    }
+  })();
+  return provisioning;
+}
+
 function registerMemoryIpc() {
   ipcMain.handle("memory:scan", () => scanMemory());
   ipcMain.handle("memory:list", () => summarizeStore());
@@ -143,48 +187,6 @@ function registerMemoryIpc() {
     shell.openExternal(workflow.platformSearch(platform, keyword));
     return true;
   });
-
-  // ---------- 开箱即用（引擎自举 + API Key） ----------
-  let setupState = { nodeReady: false, engineReady: false, apiKeySet: false };
-  let provisioning = null;
-
-  function setupResources() {
-    return {
-      resourcesDir: process.resourcesPath, // 打包后指向 app 资源目录
-      userDataDir: path.join(app.getPath("userData"), "runtime"),
-    };
-  }
-
-  function pushSetupStatus(msg) {
-    for (const w of [workflowWindow]) {
-      if (w && !w.isDestroyed()) w.webContents.send("setup:status", msg);
-    }
-  }
-
-  async function runProvision() {
-    if (provisioning) return provisioning;
-    provisioning = (async () => {
-      try {
-        pushSetupStatus("正在准备运行环境…");
-        const { resourcesDir, userDataDir } = setupResources();
-        const node = setup.ensureNode({ resourcesDir, userDataDir, onStatus: pushSetupStatus });
-        process.env.DSH_DESKTOP_NODE_BIN = node; // dsh-boot 优先用它
-        setupState.nodeReady = true;
-        const engine = await setup.ensureEngine({ node, onStatus: pushSetupStatus });
-        setupState.engineReady = !!engine;
-        setupState.apiKeySet = setup.hasApiKey();
-        pushSetupStatus(setupState.apiKeySet ? "引擎与密钥就绪" : "引擎就绪，请填写 API Key");
-        for (const w of [workflowWindow]) if (w && !w.isDestroyed()) w.webContents.send("setup:ready", setupState);
-      } catch (e) {
-        setupState.nodeReady = false;
-        pushSetupStatus("安装失败：" + e.message);
-        for (const w of [workflowWindow]) if (w && !w.isDestroyed()) w.webContents.send("setup:error", e.message);
-      } finally {
-        provisioning = null;
-      }
-    })();
-    return provisioning;
-  }
 
   ipcMain.handle("setup:state", () => ({ ...setupState, hasSystemNode: !!setup.systemNode && typeof setup.systemNode === "function" }));
   ipcMain.handle("setup:run", () => runProvision());
