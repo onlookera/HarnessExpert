@@ -2,6 +2,8 @@ CLAUDE.local.md
 .env
 node_modules/
 lib/
+!apps/creator-studio/lib/
+!apps/desktop/lib/
 *.tsbuildinfo
 pnpm-debug.log
 .pnpm-store/
@@ -40,7 +42,7 @@ worktrees/
 .agents/worktrees/
 .typert-*/
 
-# 桌面/工作台构建产物与临时文件
+# 妗岄潰/宸ヤ綔鍙版瀯寤轰骇鐗╀笌涓存椂鏂囦欢
 apps/*/dist/
 *.log
 smoke-*.txt
