@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>DSH Desktop</title>
+  <link rel="stylesheet" href="assets/brand-font.css" />
   <style>
     :root {
       --bg: #05070f;
@@ -78,7 +79,11 @@
       -webkit-background-clip: text; background-clip: text; color: transparent;
       margin-bottom: 6px;
     }
-    .sub { font-size: 12px; color: var(--dim); letter-spacing: 3px; margin-bottom: 30px; }
+    .sub { font-size: 12px; color: var(--dim); letter-spacing: 3px; margin-bottom: 18px; font-family: Montserrat, "Segoe UI", sans-serif; }
+
+    /* 品牌字标（DeepSeek Harness） */
+    .brand { width: 208px; margin: 0 auto 20px; opacity: .92; }
+    .brand img { display: block; width: 100%; height: auto; }
 
     .status {
       font-size: 13px; color: #a9bce0; min-height: 20px;
@@ -105,6 +110,7 @@
 </head>
 <body>
   <div class="stage">
+    <div class="brand"><img src="assets/welcome-brand.svg" alt="DeepSeek Harness" /></div>
     <div class="core">
       <div class="ring"></div><div class="ring"></div><div class="ring"></div>
       <div class="core-glow"></div>
